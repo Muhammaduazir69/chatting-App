@@ -1,154 +1,387 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Multi-User Video Call</title>
+  <head>
+    <title>Hamood Qalay Services</title>
 
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-        <link rel='stylesheet' href='assets/css/app.css' type="text/css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="assets/css/app.css" type="text/css" />
 
-        <script src='/socket.io/socket.io.js'></script>
-        <script type="module" src='assets/js/rtc.js'></script>
-        <script type="module" src='assets/js/events.js'></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/7.3.0/adapter.min.js" integrity="sha256-2qQheewaqnZlXJ3RJRghVUwD/3fD9HNqxh4C+zvgmF4=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js'></script>
-        <script src='https://cdn.rawgit.com/yahoo/xss-filters/master/dist/xss-filters.js'></script>
-        <script src='assets/js/autolink.js'></script>
-    </head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="assets/js/rtc.js"></script>
+    <script type="module" src="assets/js/events.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/7.3.0/adapter.min.js"
+      integrity="sha256-2qQheewaqnZlXJ3RJRghVUwD/3fD9HNqxh4C+zvgmF4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+    <script src="https://cdn.rawgit.com/yahoo/xss-filters/master/dist/xss-filters.js"></script>
+    <script src="assets/js/autolink.js"></script>
+  </head>
+  <style>
+    ul {
+  list-style-type: none;
+}
 
-    <body>
-        <div class="custom-modal" id='recording-options-modal'>
-            <div class="custom-modal-content">
-                <div class="row text-center">
-                    <div class="col-md-6 mb-2">
-                        <span class="record-option" id='record-video'>Record video</span>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <span class="record-option" id='record-screen'>Record screen</span>
-                    </div>
-                </div>
+li {
+  display: inline-block;
+}
 
-                <div class="row mt-3">
-                    <div class="col-md-12 text-center">
-                        <button class="btn btn-outline-danger" id='closeModal'>Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-        <nav class="navbar fixed-top bg-info rounded-0 d-print-none">
-            <div class="text-white">Video Call</div>
+input[type="checkbox"][id^="cb"] {
+  display: none;
+}
 
-            <div class="pull-right room-comm" hidden>
-                <span class="text-white mr-5">
-                    Unique Identifier: <span id='randomNumber'></span>
-                </span>
+label {
+  border: 1px solid #fff;
+  padding: 10px;
+  display: block;
+  position: relative;
+  margin: 10px;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 
-                <button class="btn btn-sm rounded-0 btn-no-effect" id='toggle-video' title="Hide Video">
-                    <i class="fa fa-video text-white"></i>
-                </button>
+label::before {
+  background-color: white;
+  color: white;
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  border: 1px solid grey;
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  line-height: 28px;
+  transition-duration: 0.4s;
+  transform: scale(0);
+}
 
-                <button class="btn btn-sm rounded-0 btn-no-effect" id='toggle-mute' title="Mute">
-                    <i class="fa fa-microphone-alt text-white"></i>
-                </button>
+label img {
+  height: 100px;
+  width: 100px;
+  transition-duration: 0.2s;
+  transform-origin: 50% 50%;
+}
 
-                <button class="btn btn-sm rounded-0 btn-no-effect" id='share-screen' title="Share screen">
-                    <i class="fa fa-desktop text-white"></i>
-                </button>
+:checked+label {
+  border-color: #ddd;
+}
 
-                <button class="btn btn-sm rounded-0 btn-no-effect" id='record' title="Record">
-                    <i class="fa fa-dot-circle text-white"></i>
-                </button>
+:checked+label::before {
+  content: "✓";
+  background-color: grey;
+  transform: scale(1);
+}
 
-                <button class="btn btn-sm text-white pull-right btn-no-effect" id='toggle-chat-pane'>
-                    <i class="fa fa-comment"></i> <span class="badge badge-danger very-small font-weight-lighter" id='new-chat-notification' hidden>New</span>
-                </button>
+:checked+label img {
+  transform: scale(0.9);
+  box-shadow: 0 0 5px #333;
+  z-index: -1;
+}
 
-                <button class="btn btn-sm rounded-0 btn-no-effect text-white">
-                    <a href="/" class="text-white text-decoration-none"><i class="fa fa-sign-out-alt text-white" title="Leave"></i></a>
-                </button>
-            </div>
-        </nav>
+  </style>
 
-        <div class="container-fluid" id='room-create' hidden>
-            <div class="row">
-                <div class="col-12 h2 mt-5 text-center">Create Room</div>
-            </div>
-            
-            <div class="row mt-2">
-                <div class="col-12 text-center">
-                    <span class="form-text small text-danger" id='err-msg'></span>
-                </div>
-
-                <div class="col-12 col-md-4 offset-md-4 mb-3">
-                    <label for="room-name">Room Name</label>
-                    <input type="text" id='room-name' class="form-control rounded-0" placeholder="Room Name">
-                </div>
-
-                <div class="col-12 col-md-4 offset-md-4 mb-3">
-                    <label for="your-name">Your Name</label>
-                    <input type="text" id='your-name' class="form-control rounded-0" placeholder="Your Name">
-                </div>
-
-                <div class="col-12 col-md-4 offset-md-4 mb-3">
-                    <button id='create-room' class="btn btn-block rounded-0 btn-info">Create Room</button>
-                </div>
-
-                <div class="col-12 col-md-4 offset-md-4 mb-3" id='room-created'></div>
-            </div>
-        </div>
-
-
-
-        <div class="container-fluid" id='username-set' hidden>
-            <div class="row">
-                <div class="col-12 h4 mt-5 text-center">Your Name</div>
-            </div>
-            
-            <div class="row mt-2">
-                <div class="col-12 text-center">
-                    <span class="form-text small text-danger" id='err-msg-username'></span>
-                </div>
-
-                <div class="col-12 col-md-4 offset-md-4 mb-3">
-                    <label for="username">Your Name</label>
-                    <input type="text" id='username' class="form-control rounded-0" placeholder="Your Name">
-                </div>
-
-                <div class="col-12 col-md-4 offset-md-4 mb-3">
-                    <button id='enter-room' class="btn btn-block rounded-0 btn-info">Enter Room</button>
-                </div>
-            </div>
+  <body>
+    <div class="custom-modal" id="recording-options-modal">
+      <div class="custom-modal-content">
+        <div class="row text-center">
+          <div class="col-md-6 mb-2">
+            <span class="record-option" id="record-video">Record video</span>
+          </div>
+          <div class="col-md-6 mb-2">
+            <span class="record-option" id="record-screen">Record screen</span>
+          </div>
         </div>
 
-
-        
-        <div class="container-fluid room-comm" hidden>
-            <div class="row">
-                <video class="local-video mirror-mode" id='local' volume='0' autoplay muted></video>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-12 main" id='main-section'>                    
-                    <div class="row mt-2 mb-2" id='videos'></div>
-                </div>
-
-                <div class="col-md-3 chat-col d-print-none mb-2 bg-info" id='chat-pane' hidden>
-                    <div class="row">
-                        <div class="col-12 text-center h2 mb-3">CHAT</div>
-                    </div>
-
-                    <div id='chat-messages'></div>
-
-                    <div class="row">
-                        <textarea id='chat-input' class="form-control rounded-0 chat-box border-info" rows='3' placeholder="Type here..."></textarea>
-                    </div>
-                </div>
-            </div>
+        <div class="row mt-3">
+          <div class="col-md-12 text-center">
+            <button class="btn btn-outline-danger" id="closeModal">
+              Close
+            </button>
+          </div>
         </div>
-    </body>
+      </div>
+    </div>
+
+    <nav class="navbar fixed-top bg-info rounded-0 d-print-none">
+      <div class="text-white">Online Teaching UK</div>
+
+      <div class="pull-right room-comm" hidden>
+        <!--<span class="text-white mr-5">
+          Unique Identifier: <span id="randomNumber"></span>
+        </span>-->
+
+        <a href="">
+          <img
+            src="data:image/png;base64,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"
+            width="35"
+            height="40"
+          />
+        </a>
+        <button
+          class="btn btn-sm rounded-0 btn-no-effect"
+          id="toggle-video"
+          title="Hide Video"
+        >
+          <i class="fa fa-video text-white"></i>
+        </button>
+
+        <button
+          class="btn btn-sm rounded-0 btn-no-effect"
+          id="toggle-mute"
+          title="Mute"
+        >
+          <i class="fa fa-microphone-alt text-white"></i>
+        </button>
+
+        <button
+          class="btn btn-sm rounded-0 btn-no-effect"
+          id="share-screen"
+          title="Share screen"
+        >
+          <i class="fa fa-desktop text-white"></i>
+        </button>
+
+        <button
+          class="btn btn-sm rounded-0 btn-no-effect"
+          id="record"
+          title="Record"
+        >
+          <i class="fa fa-dot-circle text-white"></i>
+        </button>
+
+        <button
+          class="btn btn-sm text-white pull-right btn-no-effect"
+          id="toggle-chat-pane"
+        >
+          <i class="fa fa-comment"></i>
+          <span
+            class="badge badge-danger very-small font-weight-lighter"
+            id="new-chat-notification"
+            hidden
+            >New</span
+          >
+        </button>
+
+        <button class="btn btn-sm rounded-0 btn-no-effect text-white">
+          <a href="/" class="text-white text-decoration-none"
+            ><i class="fa fa-sign-out-alt text-white" title="Leave"></i
+          ></a>
+        </button>
+      </div>
+    </nav>
+
+    <div class="container-fluid" id="room-create" hidden>
+      <div class="row">
+        <div class="col-12 h2 mt-5 text-center">Create Room</div>
+      </div>
+      
+    <div class="avatar">
+      <ul>
+        <li><input type="checkbox" id="cb1" />
+          <label for="cb1"><img src="/assets/1.jpg" /></label>
+        </li>
+        <li><input type="checkbox" id="cb2" />
+          <label for="cb2"><img src="/assets/2.png" /></label>
+        </li>
+        <li><input type="checkbox" id="cb3" />
+          <label for="cb3"><img src="/assets/3.png" /></label>
+        </li>
+        <li><input type="checkbox" id="cb4" />
+          <label for="cb4"><img src="/assets/4.png" /></label>
+        </li>
+        <li><input type="checkbox" id="cb5" />
+          <label for="cb5"><img src="/assets/5.png" /></label>
+        </li>
+        <li><input type="checkbox" id="cb6" />
+          <label for="cb6"><img src="/assets/6.jpg" /></label>
+        </li>
+        <li><input type="checkbox" id="cb7" />
+          <label for="cb7"><img src="/assets/7.jpg" /></label>
+        </li>
+        <li><input type="checkbox" id="cb8" />
+          <label for="cb8"><img src="/assets/8.jpg" /></label>
+        </li>
+      </ul>
+    </div>
+
+
+      <!--<div class="avatar" style="text-align: center">
+        <a href="">
+          <img
+            src="/assets/vector.jpg"
+            width="100"
+            height="100"
+          />
+        </a>
+        <a href="">
+          <img
+            src="/assets/vector2.png"
+            width="100"
+            height="100"
+          />
+          <a href="">
+            <img
+              src="/assets/gif1.png"
+              width="100"
+              height="100"
+            />
+          </a>
+        </a>
+      </div>
+
+      <div class="avatar2" style="text-align: center">
+        <a href="">
+          <img
+            src="/assets/vector.jpg"
+            width="100"
+            height="100"
+          />
+        </a>
+        <a href="">
+          <img
+            src="/assets/vector2.png"
+            width="100"
+            height="100"
+          />
+          <a href="">
+            <img
+              src="/assets/vector.png"
+              width="100"
+              height="100"
+            />
+          </a>
+        </a>
+      </div>
+    -->
+      
+
+
+      <div class="row mt-2">
+        <div class="col-12 text-center">
+          <span class="form-text small text-danger" id="err-msg"></span>
+        </div>
+
+        <div class="col-12 col-md-4 offset-md-4 mb-3">
+          <label for="room-name">Room Name</label>
+          <input
+            type="text"
+            id="room-name"
+            class="form-control rounded-0"
+            placeholder="Room Name"
+          />
+        </div>
+
+        <div class="col-12 col-md-4 offset-md-4 mb-3">
+          <label for="your-name">Your Name</label>
+          <input
+            type="text"
+            id="your-name"
+            class="form-control rounded-0"
+            placeholder="Your Name"
+          />
+        </div>
+
+        <div class="col-12 col-md-4 offset-md-4 mb-3">
+          <button id="create-room" class="btn btn-block rounded-0 btn-info">
+            Create Room
+          </button>
+        </div>
+
+        <div class="col-12 col-md-4 offset-md-4 mb-3" id="room-created"></div>
+      </div>
+    </div>
+
+    <div class="container-fluid" id="username-set" hidden>
+      <div class="row">
+        <div class="col-12 h4 mt-5 text-center">Your Name</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12 text-center">
+          <span
+            class="form-text small text-danger"
+            id="err-msg-username"
+          ></span>
+        </div>
+
+        <div class="col-12 col-md-4 offset-md-4 mb-3">
+          <label for="username">Your Name</label>
+          <input
+            type="text"
+            id="username"
+            class="form-control rounded-0"
+            placeholder="Your Name"
+          />
+        </div>
+
+        <div class="col-12 col-md-4 offset-md-4 mb-3">
+          <button id="enter-room" class="btn btn-block rounded-0 btn-info">
+            Enter Room
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid room-comm" hidden>
+      <div class="row">
+        <video
+          class="local-video mirror-mode"
+          id="local"
+          volume="0"
+          autoplay
+          muted
+        ></video>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 main" id="main-section">
+          <div class="row mt-2 mb-2" id="videos"></div>
+        </div>
+
+        <div
+          class="col-md-3 chat-col d-print-none mb-2 bg-info"
+          id="chat-pane"
+          hidden
+        >
+          <div class="row">
+            <div class="col-12 text-center h2 mb-3">CHAT</div>
+          </div>
+
+          <div id="chat-messages"></div>
+
+          <div class="row">
+            <textarea
+              id="chat-input"
+              class="form-control rounded-0 chat-box border-info"
+              rows="3"
+              placeholder="Type here..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
